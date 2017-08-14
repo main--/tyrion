@@ -1,0 +1,16 @@
+[package]
+name = "tyrion"
+version = "0.1.0"
+authors = ["main() <main@ehvag.de>"]
+
+[profile.dev]
+panic = "abort"
+debug = true
+
+[profile.release]
+panic = "abort"
+debug = true
+
+[dependencies]
+backtrace = "0.3"
+libc = "0.2"
