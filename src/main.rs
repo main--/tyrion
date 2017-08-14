@@ -9,7 +9,7 @@ use libc::{c_void, c_int, c_char};
 use backtrace::Backtrace;
 
 fn test() {
-    panic!("lul");
+    panic!("test panic");
 }
 
 extern "C" {
@@ -39,7 +39,11 @@ fn main() {
         }
 
         let bt = Backtrace::new();
-        if bt.frames().iter().all(|x| x.symbols().is_empty()) {
+
+        if bt.frames().iter().flat_map(|x| x.symbols()).all(|x| x.name().is_none()) {
+            // no symbols in this binary
+
+            // grab base ptr to calculate offsets
             let baseptr = unsafe {
                 let handle = libc::dlopen(ptr::null(), libc::RTLD_LAZY);
                 let mut ptr: *mut LinkMap = ptr::null_mut();
@@ -50,15 +54,18 @@ fn main() {
 
             let addrs = bt.frames().iter().map(|x| x.ip().wrapping_offset(-baseptr));
 
+            // check for symbol file
             let exe = env::current_exe().unwrap();
             let dbg = exe.with_extension("dbg");
             if dbg.exists() {
+                // grab stacktrace (only calling addr2line here because this is a mockup)
                 println!("stack backtrace (symbols from symbol file):");
                 Command::new("/usr/bin/addr2line")
                     .arg("-Cipf").arg("-e").arg(exe)
                     .arg("-a").args(addrs.map(|x| format!("{:p}", x)))
                     .status().unwrap();
             } else {
+                // have no symbol file here - someone else needs to put run addr2line
                 println!("stack backtrace (no symbols found):");
                 for frame in addrs {
                     print!("{:p} ", frame);

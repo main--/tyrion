@@ -2,4 +2,6 @@
 **/*.rs.bk
 *~
 tyrion
+tyrion-no-symbols
 tyrion.dbg
+
