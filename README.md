@@ -99,3 +99,24 @@ $ addr2line -Cipf -e target/release/tyrion -a 0x7e9e 0x7fe3 0x6ec5 0x20381 0x6b5
  (inlined by) tyrion::main at /overtime/git/tyrion/src/main.rs:81
 0x0000000000050b0b: malloc_usable_size at ??:?
 ```
+
+Or without a GNU toolchain:<a name="llvm-symbolizer"></a>
+
+```
+$ echo '0x90fe 0x9133 0x7ca5 0x255e6 0x78b7 0x7b67 0x4cacb' | sed 's/ /\n/g' | llvm-symbolizer -obj=target/release/tyrion -pretty-print -inlining -print-address -demangle
+0x90fe: backtrace::backtrace::libunwind::trace at /home/.cargo/registry/src/github.com-1ecc6299db9ec823/backtrace-0.3.2/src/backtrace/libunwind.rs:53:0
+ (inlined by) backtrace::backtrace::trace::hc53bccd1318a9f66 at /home/.cargo/registry/src/github.com-1ecc6299db9ec823/backtrace-0.3.2/src/backtrace/mod.rs:42:0
+
+0x9133: backtrace::capture::Backtrace::new::h4ebbff8c2fac5a84 at /home/.cargo/registry/src/github.com-1ecc6299db9ec823/backtrace-0.3.2/src/capture.rs:64:0
+
+0x7ca5: tyrion::main::_$u7b$$u7b$closure$u7d$$u7d$::h8f8d92d5788de0d9 at /home/git/tyrion/src/main.rs:41:0
+
+0x255e6: std::panicking::rust_panic_with_hook::h6a5ef5a08add6d91 at /checkout/src/libstd/panicking.rs:611:0
+
+0x78b7: std::panicking::begin_panic::hb4bc08fc48aafd11 at /checkout/src/libstd/panicking.rs:571:0
+
+0x7b67: tyrion::test at /home/git/tyrion/src/main.rs:12:0
+ (inlined by) tyrion::main::h21adcb416a49c802 at /home/git/tyrion/src/main.rs:81:0
+
+0x4cacb: __rust_maybe_catch_panic at /checkout/src/libpanic_abort/lib.rs:40:0
+```
